@@ -2,18 +2,71 @@
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
+#include <cctype>
+#include <algorithm>
 
 using namespace std;
 
 int genId();
+int hourDiff(int from, int to);
+string currentDateTime(time_t time);
+string toLower(string str);
+
+struct User {
+    int id;
+    string nama;
+    int jenisKendaraan;
+    time_t mulaiParkir;
+    int lama = 0;
+    int idTempat;
+
+    User(){};
+
+    User(string nama_, int lama_, int idTempat_) {
+        id = genId();
+        nama = nama_;
+        mulaiParkir = time(NULL);
+        lama = lama_;
+        idTempat = idTempat_;
+    }
+
+    int lamaParkir() {
+        return hourDiff((int)mulaiParkir, lama != 0 ? lama : time(NULL));
+    }
+
+    int checkOut() {
+        lama = time(NULL);
+    }
+
+    string toString() {
+        return "ID : " + to_string(id) + 
+            "\n\tNama : " + nama + 
+            "\n\tJenis Kendaraan : " + (jenisKendaraan == 0 ? "Motor" : "Mobil") + 
+            "\n\tMulai Parkir : " + currentDateTime(mulaiParkir) + 
+            "\n\tLama Parkir : " + to_string(lama) + " jam" + 
+            "\n\tLama Parkir (sekarang) : " + to_string(lamaParkir()) + " jam" + 
+            "\n\tID Tempat : " + to_string(idTempat) + "\n";
+    }
+};
+
+
+struct NodeUser {
+    User data;
+    NodeUser *next = NULL;
+};
 
 struct TempatParkir {
     int id;
     string nama;
+
+    // ? Kapasitas dan harga menggunakan array yang panjangnya 2 untuk membedakan motor dan mobile {motor, mobil}
     int kapasitasTotal[2] = {0, 0};
     int kapasitasTersedia[2] = {0, 0};
     int hargaPerjam[2] = {0, 0};
+
     string lokasi;
+
+    NodeUser *waitlist = NULL;
 
     TempatParkir(){};
 
@@ -31,40 +84,44 @@ struct TempatParkir {
         hargaPerjam[1] = hargaPerjam2;
         
         lokasi = lokasi_;
-	}
-};
+	};
 
-struct User {
-    int id;
-    string nama;
-    int jenisKendaraan;
-    int lama;
-    int idTempat;
-
-    User(){};
-
-    User(int id_, string nama_, int lama_, int idTempat_) {
-        id = id_;
-        nama = nama_;
-        lama = lama_;
-        idTempat = idTempat_;
+    string toString() {
+        return "ID : " + to_string(id) + 
+            "\n\tNama : " + nama + 
+            "\n\tKapasitas Total Motor : " + to_string(kapasitasTotal[0]) 
+            + " (tersedia " + to_string(kapasitasTersedia[0]) + ")" + 
+            "\n\tKapasitas Total Mobil : " + to_string(kapasitasTotal[1]) 
+            + " (tersedia " + to_string(kapasitasTersedia[1]) + ")" + 
+            "\n\tLokasi : " +  lokasi + 
+            "\n\tTarif Perjam Motor : " + to_string(hargaPerjam[0]) + 
+            "\n\tTarif Perjam Mobil : " + to_string(hargaPerjam[1]) + "\n";
     }
 };
 
+
+// ? Inisialisasi data
+// ? List tempat parkir dan List User menggunakan library vector agar dapat membuat array dinamis
 vector<TempatParkir> listTempatParkir {
-    TempatParkir(genId(), "Parkir Bec0", 100, 100, 2000, 5000, "Bandung"),
-    TempatParkir(genId(), "Parkir Bec1", 100, 100, 2000, 5000, "Bandung"),
-    TempatParkir(genId(), "Parkir Bec2", 100, 100, 2000, 5000, "Bandung"),
-    TempatParkir(genId(), "Parkir Bec3", 100, 100, 2000, 5000, "Bandung"),
-    TempatParkir(genId(), "Parkir Bec4", 100, 100, 2000, 5000, "Bandung"),
-    TempatParkir(genId(), "Parkir AS0", 100, 100, 4000, 10000, "Jakarta"),
-    TempatParkir(genId(), "Parkir AS1", 100, 100, 4000, 10000, "Jakarta"),
-    TempatParkir(genId(), "Parkir AS2", 100, 100, 4000, 10000, "Jakarta"),
-    TempatParkir(genId(), "Parkir AS3", 100, 100, 4000, 10000, "Jakarta"),
-    TempatParkir(genId(), "Parkir AS4", 100, 100, 4000, 10000, "Jakarta"),
+    TempatParkir(0, "Parkir Bec0", 100, 100, 2000, 5000, "Bandung"),
+    TempatParkir(1, "Parkir Bec1", 100, 100, 2000, 5000, "Bandung"),
+    TempatParkir(2, "Parkir Bec2", 100, 100, 2000, 5000, "Bandung"),
+    TempatParkir(3, "Parkir Bec3", 1, 2, 2000, 5000, "Bandung"),
+    TempatParkir(4, "Parkir Bec4", 100, 100, 2000, 5000, "Bandung"),
+    TempatParkir(5, "Parkir AS0", 100, 100, 4000, 10000, "Jakarta"),
+    TempatParkir(6, "Parkir AS1", 100, 100, 4000, 10000, "Jakarta"),
+    TempatParkir(7, "Parkir AS2", 100, 100, 4000, 10000, "Jakarta"),
+    TempatParkir(8, "Parkir AS3", 100, 100, 4000, 10000, "Jakarta"),
+    TempatParkir(9, "Parkir AS4", 100, 100, 4000, 10000, "Jakarta"),
 };
 
-vector<User> listUser;
+vector<User> listUserParkir;
+
+string toLower(string str) {
+    string newstr = str;
+    transform(newstr.begin(), newstr.end(), newstr.begin(), ::tolower);
+    return newstr;
+}
 
 void clearscr() {
 #ifdef WINDOWS
@@ -81,7 +138,7 @@ void pausescr() {
     getline(cin, dummy);
 }
 
-// input angka
+// ? input angka dengan validasi
 int inputNumber(string message, int min, int max) {
     int input;
     string inputStr;
@@ -106,36 +163,132 @@ int inputNumber(string message, int min, int max) {
     return input;
 }
 
-const string currentDateTime()
-{
-    time_t now = time(0);
+string currentDateTime(time_t time) {
+    time_t now = time;
     struct tm tstruct;
     char buf[80];
     tstruct = *localtime(&now);
-    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
 
     return buf;
+}
+
+int hourDiff(int from, int to) {
+    return (to - from) / 3600;
 }
 
 int genId() {
     return time(NULL);
 }
 
-void semuaTempat() {
+void viewNodeUser(int indexTempat) {
+    if (listTempatParkir[indexTempat].waitlist != NULL) {
+        NodeUser *temp;
+        int count = 0;
+        temp = listTempatParkir[indexTempat].waitlist;
+        cout << "\n===== Data Waiting List =====" << endl;
+        while (temp != NULL) {
+            cout << ++count << ".\t" << temp -> data.toString();
+            temp = temp -> next;
+        }
+    }
+}
+
+void insertLastNodeUser(int indexTempat, User user) {
+    NodeUser *newNode; 
+    NodeUser *temp; 
+    newNode = new NodeUser; 
+    newNode->data = user; 
+    newNode->next = NULL; 
+
+    if (listTempatParkir[indexTempat].waitlist == NULL) {
+        listTempatParkir[indexTempat].waitlist = newNode;
+        listTempatParkir[indexTempat].waitlist -> next = NULL;
+    } else {
+        temp = listTempatParkir[indexTempat].waitlist;
+        while (temp -> next != NULL) { 
+            temp = temp -> next;
+        }
+        temp -> next = newNode;
+    }
+}
+
+void deleteAtNodeUser(int indexTempat, User user) {
+    NodeUser *prev = NULL;
+    NodeUser *temp = listTempatParkir[indexTempat].waitlist;
+
+    if (listTempatParkir[indexTempat].waitlist == NULL) {
+        return;
+    }
     
+    if (listTempatParkir[indexTempat].waitlist->data.id == user.id) {
+        listTempatParkir[indexTempat].waitlist = temp->next;
+        delete temp;
+        return;
+    }
+    
+    while (temp != NULL && temp->data.id != user.id)      {
+        prev = temp;
+        temp = temp->next;
+    }
+ 
+    if (temp == NULL)
+        return;
+ 
+    prev->next = temp->next;
+ 
+    delete temp;
+}
+
+int getTempatIndex(int id) {
+    int found = -1;
+    for (int i = 0; i < listTempatParkir.size(); i++) {
+        if (listTempatParkir[i].id == id) {
+            found = i;
+        }
+    }
+    return found;
+}
+
+int getUserIndex(int id) {
+    int found = -1;
+    for (int i = 0; i < listUserParkir.size(); i++) {
+        if (listUserParkir[i].id == id) {
+            found = i;
+        }
+    }
+    return found;
+}
+
+void semuaTempat() {
+    cout << "\nList Semua Tempat Parkir\n";
+    for (int i = 0; i < listTempatParkir.size(); i++) {
+        cout << i+1 << ".\t" << listTempatParkir[i].toString() << "\n";
+    }
 }
 
 void cariTempat() {
+    string cari;
+    cout << "Masukan tempat yang dicari (nama/lokasi) : ";
+    cin >> cari;
+    
+    cout << "\nHasil Pencarian Tempat Parkir\n";
+    for (int i = 0; i < listTempatParkir.size(); i++) {
+        string lokasiNama = toLower(listTempatParkir[i].lokasi + listTempatParkir[i].nama);
+        if (lokasiNama.find(toLower(cari)) != string::npos) {
+            cout << i+1 << "\t" << listTempatParkir[i].toString() << "\n";
+        }
+    }
     
 }
 
 void daftarTempat() {
     int pilihan;
-    cout << "Daftar tempat parkir\n";
+    cout << "\nDaftar tempat parkir\n";
     cout << "1.\tTampilkan Semua\n";
     cout << "2.\tCari dengan nama tempat atau lokasi\n";
     
-    pilihan = inputNumber("Pilihan : ", 1, 3);
+    pilihan = inputNumber("Pilihan : ", 1, 2);
 
     switch (pilihan)
     {
@@ -148,11 +301,141 @@ void daftarTempat() {
     default:
         return;
     }
+
+    cout << "\nCopy ID tempat parkir untuk booking\n";
+}
+
+void bookTempat() {
+    int id;
+    cout << "\nMasukan ID Tempat yang ingin di book : ";
+    cin >> id;
+
+    int indexTempat = getTempatIndex(id);
+    if (indexTempat == -1) {
+        cout << "\nID tempat tidak ditemukan";
+        return;
+    }
+    
+    User newUser;
+    newUser.id = genId();
+    newUser.idTempat = id;
+    
+    cout << "\nMasukan nama : ";
+    cin >> newUser.nama;
+    newUser.jenisKendaraan = inputNumber("\nMasukan jenis kendaraan (motor :  0, mobil : 1) : ", 0, 1);
+    newUser.lama = inputNumber("\nMasukan lama parkir (per jam) : ", 1, 12);
+
+    if (listTempatParkir[indexTempat].kapasitasTersedia[newUser.jenisKendaraan] == 0) {
+        string confirm;
+        cout << "\nKapasitas Parkir di " << listTempatParkir[indexTempat].nama << " sudah penuh";
+        cout << "\nApakah anda ingin masuk Waiting List? (y/t) ";
+        cin >> confirm;
+        if (toLower(confirm) == "y") {
+            insertLastNodeUser(indexTempat, newUser);
+            cout << "\nUser telah dimasukan ke waiting list";
+        } else {
+            cout << "\nBooking parkir gagal";
+        }
+    } else {
+        listUserParkir.push_back(newUser);
+        listTempatParkir[indexTempat].kapasitasTersedia[newUser.jenisKendaraan] = listTempatParkir[indexTempat].kapasitasTersedia[newUser.jenisKendaraan] - 1;
+        
+        cout << "\nBooking parkir berhasil dengan User : \n\t" << newUser.toString();
+    }
+    
+    
 }
 
 
 void cekStatus() {
+    int pilihan;
+    cout << "Cek Status\n";
+    cout << "1.\tTempat\n";
+    cout << "2.\tID parkir User\n";
     
+    pilihan = inputNumber("Pilihan : ", 1, 2);
+
+    switch (pilihan)
+    {
+    case 1 : {
+        int id;
+        cout << "\nMasukan ID Tempat Parkir : ";
+        cin >> id;
+    
+        int indexTempat = getTempatIndex(id);
+        if (indexTempat == -1) {
+            cout << "\nID tempat tidak ditemukan";
+            return;
+        }
+
+        cout << "1.\t" << listTempatParkir[indexTempat].toString();
+
+        cout << "\nList User Parkir\n";
+        for (int i = 0; i < listUserParkir.size(); i++) {
+            if (listUserParkir[i].idTempat == id) {
+                cout << i+1 << ".\t" << listUserParkir[i].toString() << "\n";
+            }
+        }
+        
+        viewNodeUser(indexTempat);
+        
+        break;
+    }
+    case 2: {
+        int id;
+        cout << "\nMasukan ID User : ";
+        cin >> id;
+    
+        int indexUser = getUserIndex(id);
+        if (indexUser == -1) {
+            cout << "\nID User tidak ditemukan";
+            return;
+        }
+        
+        cout << "\n1.\t" << listUserParkir[indexUser].toString();
+        break;
+    }
+    default:
+        return;
+    }
+}
+
+void checkOut() {
+    int id;
+    cout << "\nMasukan ID parkir User yang ingin di Check Out : ";
+    cin >> id;
+
+    int indexUser = getUserIndex(id);
+    if (indexUser == -1) {
+        cout << "\nID User tidak ditemukan";
+        return;
+    }
+    
+    cout << "\n1.\t" << listUserParkir[indexUser].toString();
+
+    int indexTempat = getTempatIndex(listUserParkir[indexUser].idTempat);
+    int kapasitasTersediaBaru = listTempatParkir[indexTempat].kapasitasTersedia[listUserParkir[indexUser].jenisKendaraan] + 1;
+    listTempatParkir[indexTempat].kapasitasTersedia[listUserParkir[indexUser].jenisKendaraan] =kapasitasTersediaBaru;
+
+    listUserParkir.erase(listUserParkir.begin()+indexUser);
+
+    cout << "\nID parkir User dengan ID " << id << " Berhasil di checkout!";
+
+    if (listTempatParkir[indexTempat].waitlist != NULL) {
+        NodeUser *temp = NULL;
+        int count = 0;
+        temp = listTempatParkir[indexTempat].waitlist;
+        while (temp != NULL && count < kapasitasTersediaBaru) {
+            ++count;
+            listUserParkir.push_back(temp->data);
+            
+            deleteAtNodeUser(indexTempat, temp->data);
+            listTempatParkir[indexTempat].kapasitasTersedia[listUserParkir[indexUser].jenisKendaraan] =kapasitasTersediaBaru-1;
+            temp = temp -> next;
+        }
+
+        cout << "\n" << count << " User di Waiting List berhasil dipindahkan ke list booking :";
+    }
 }
 
 void pilihMenu()
@@ -163,8 +446,8 @@ void pilihMenu()
     cout << "\n\n=============================\n";
     cout << "Muhamad Fadil – 2109994 – 2B\n\n";
     cout << "Pilih Menu (1-2)\n";
-    cout << "1. Daftar Tempat\n2. Cek Status\n3. Keluar\n";
-    pilihanMenu = inputNumber("Pilihan : ", 1, 3);
+    cout << "1. Daftar Tempat\n2. Book Tempat\n3. Cek Out\n4. Cek Status\n5. Keluar\n";
+    pilihanMenu = inputNumber("Pilihan : ", 1, 5);
     cin.ignore(256, '\n');
     cout << "\n=============================\n\n";
 
@@ -176,6 +459,12 @@ void pilihMenu()
         daftarTempat();
         break;
     case 2:
+        bookTempat();
+        break;
+    case 3:
+        checkOut();
+        break;
+    case 4:
         cekStatus();
         break;
     default:
@@ -188,6 +477,5 @@ void pilihMenu()
 }
 
 int main() {
-    srand (time(NULL));
     pilihMenu();
 }
