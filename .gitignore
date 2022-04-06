@@ -1,1 +1,5 @@
-.ccls-cache
+*
+!main.cpp
+!Makefile
+!replit.nix
+!.replit
