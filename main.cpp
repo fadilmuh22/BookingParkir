@@ -1,9 +1,11 @@
-#include <algorithm>
-#include <cctype>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
+
+// untuk mengubah string ke lower case
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -126,11 +128,11 @@ string toLower(string str) {
 
 // clearscr membersihkan console sesuai dengan OS
 void clearscr() {
-#ifdef WINDOWS
-  system("cls");
-#else
+  // #ifdef WINDOWS
+  // system("cls");
+  // #else
   system("clear");
-#endif
+  // #endif
 }
 
 void pausescr() {
@@ -150,6 +152,8 @@ int inputNumber(string message, int min, int max) {
     cout << message;
     cin >> inputStr;
 
+    // try-catch buat nangkep error dari stoi
+    // kalo berhasil inputValid = true
     try {
       input = stoi(inputStr);
       if ((input >= min) && (input <= max)) {
@@ -168,16 +172,6 @@ int inputNumber(string message, int min, int max) {
 // currentDateTime output string tanggal dengan format
 string currentDateTime(time_t time) {
   time_t now = time;
-  struct tm tstruct;
-  char buf[80];
-  tstruct = *localtime(&now);
-  strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
-
-  return buf;
-}
-
-string currentDateTime() {
-  time_t now = time(NULL);
   struct tm tstruct;
   char buf[80];
   tstruct = *localtime(&now);
@@ -341,7 +335,9 @@ void bookTempat() {
   newUser.jenisKendaraan =
       inputNumber("\nMasukan jenis kendaraan (motor :  0, mobil : 1) : ", 0, 1);
   newUser.lama = inputNumber("\nMasukan lama parkir (per jam) : ", 1, 12);
-  newUser.tarif = newUser.lama * listTempatParkir[indexTempat].hargaPerjam[newUser.jenisKendaraan];
+  newUser.tarif =
+      newUser.lama *
+      listTempatParkir[indexTempat].hargaPerjam[newUser.jenisKendaraan];
 
   // Pengecekan kapasitas parkir sesuai dengan kendaraan user
   if (listTempatParkir[indexTempat].kapasitasTersedia[newUser.jenisKendaraan] ==
