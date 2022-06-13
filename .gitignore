@@ -1,5 +1,7 @@
 *
 !main.cpp
+!data.hpp
+!util.hpp
 !Makefile
 !replit.nix
 !.replit
