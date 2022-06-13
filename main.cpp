@@ -29,8 +29,7 @@ void checkWaitlist(int indexTempat, int jenisKendaraan)
             temp = temp->next;
         }
 
-        cout << "\n"
-             << " User di Waiting List " << listTempatParkir[indexTempat].nama << " berhasil dipindahkan ke list booking";
+        cout << "\n User di Waiting List " << listTempatParkir[indexTempat].nama << " berhasil dipindahkan ke list booking";
     }
 }
 
@@ -395,15 +394,14 @@ void pindahParkir()
     int countTempatBaru = 0;
     for (int i = 0; i < listTempatParkir.size(); i++)
     {
-        if (std::find(destinasiBaru.begin(), destinasiBaru.end(), listTempatParkir[i].id) != destinasiBaru.end())
+        if (find(destinasiBaru.begin(), destinasiBaru.end(), listTempatParkir[i].id) != destinasiBaru.end())
         {
             cout << ++countTempatBaru << ".\t" << listTempatParkir[i].toString() << "\n";
         }
     }
 
-    int idTempat;
-    cout << "\nMasukan ID Tempat parkir baru : ";
-    cin >> idTempat;
+    int idTempat = inputNumberFromArray("\nMasukan ID Tempat parkir baru : ", destinasiBaru);
+	
 
     int indexTempatBaru = getTempatIndex(idTempat);
     if (indexTempatBaru == -1)

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <vector>
 
 #include <algorithm>
 #include <cctype>
@@ -66,6 +67,47 @@ int inputNumber(string message, int min, int max)
         catch (const exception &e)
         {
             cout << "Inputan tidak sesuai, angka(" << min << ", " << max << ")\n";
+        }
+    }
+
+    return input;
+}
+
+int inputNumberFromArray(string message, vector<int> cons) {
+	int input;
+    string inputStr;
+    bool inputValid = false;
+
+    while (!inputValid)
+    {
+        cout << message;
+        cin >> inputStr;
+
+        // try-catch buat nangkep error dari stoi
+        // kalo berhasil inputValid = true
+        try
+        {
+            input = stoi(inputStr);
+            if ( find(cons.begin(), cons.end(), input) != cons.end() )
+            {
+                inputValid = true;
+            }
+            else
+            {
+                cout << "Inputan tidak sesuai, angka(";
+				for (auto di : cons) {
+					cout << di << ", ";
+				}
+				cout << ")\n";
+            }
+        }
+        catch (const exception &e)
+        {
+            cout << "Inputan tidak sesuai, angka(";
+			for (auto di : cons) {
+				cout << di << ", ";
+			}
+			cout << ")\n";
         }
     }
 
