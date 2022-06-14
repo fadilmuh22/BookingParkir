@@ -73,8 +73,9 @@ int inputNumber(string message, int min, int max)
     return input;
 }
 
-int inputNumberFromArray(string message, vector<int> cons) {
-	int input;
+int inputNumberFromArray(string message, vector<int> cons)
+{
+    int input;
     string inputStr;
     bool inputValid = false;
 
@@ -88,26 +89,28 @@ int inputNumberFromArray(string message, vector<int> cons) {
         try
         {
             input = stoi(inputStr);
-            if ( find(cons.begin(), cons.end(), input) != cons.end() )
+            if (find(cons.begin(), cons.end(), input) != cons.end())
             {
                 inputValid = true;
             }
             else
             {
                 cout << "Inputan tidak sesuai, angka(";
-				for (auto di : cons) {
-					cout << di << ", ";
-				}
-				cout << ")\n";
+                for (auto di : cons)
+                {
+                    cout << di << ", ";
+                }
+                cout << ")\n";
             }
         }
         catch (const exception &e)
         {
             cout << "Inputan tidak sesuai, angka(";
-			for (auto di : cons) {
-				cout << di << ", ";
-			}
-			cout << ")\n";
+            for (auto di : cons)
+            {
+                cout << di << ", ";
+            }
+            cout << ")\n";
         }
     }
 
